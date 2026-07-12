@@ -1,0 +1,104 @@
+{
+  "_comment": "Levels 1-5, authored by hand rather than generated, so the first five boards teach the rule on purpose instead of leaving a player's first impression to chance. Each one adds exactly one idea. They sit on the same 11x11 board the easy tier uses, so the campaign opens at the size it goes on with — the teaching comes from how few arrows there are and how they are placed, not from a smaller grid. Verified by levels.test.ts like every other level.",
+  "levels": [
+    {
+      "_teaches": "Tap an arrow and it leaves. Nothing is in anyone's way, so any order works.",
+      "id": 1,
+      "tier": "warmup",
+      "rows": 11,
+      "cols": 11,
+      "arrows": [
+        { "id": "a1", "dir": "left", "body": [{ "row": 1, "col": 1 }] },
+        { "id": "a2", "dir": "right", "body": [{ "row": 2, "col": 8 }] },
+        { "id": "a3", "dir": "down", "body": [{ "row": 8, "col": 2 }] },
+        { "id": "a4", "dir": "up", "body": [{ "row": 5, "col": 5 }] },
+        { "id": "a5", "dir": "right", "body": [{ "row": 9, "col": 7 }] }
+      ],
+      "solution": ["a1", "a2", "a3", "a4", "a5"]
+    },
+    {
+      "_teaches": "An arrow can be blocked. a2 stands in a1's lane and a4 stands in a3's, so each pair has an order. a5 is free the whole time.",
+      "id": 2,
+      "tier": "warmup",
+      "rows": 11,
+      "cols": 11,
+      "arrows": [
+        { "id": "a1", "dir": "right", "body": [{ "row": 5, "col": 2 }] },
+        { "id": "a2", "dir": "up", "body": [{ "row": 5, "col": 6 }] },
+        { "id": "a3", "dir": "down", "body": [{ "row": 2, "col": 9 }] },
+        { "id": "a4", "dir": "left", "body": [{ "row": 7, "col": 9 }] },
+        { "id": "a5", "dir": "left", "body": [{ "row": 9, "col": 1 }] }
+      ],
+      "solution": ["a2", "a1", "a4", "a3", "a5"]
+    },
+    {
+      "_teaches": "An arrow has a BODY, and the body blocks other arrows. The long arrow a2 lies across a1's lane — a1 cannot move until the whole of a2 is gone.",
+      "id": 3,
+      "tier": "warmup",
+      "rows": 11,
+      "cols": 11,
+      "arrows": [
+        { "id": "a1", "dir": "right", "body": [{ "row": 5, "col": 0 }] },
+        {
+          "id": "a2",
+          "dir": "up",
+          "body": [
+            { "row": 8, "col": 4 },
+            { "row": 7, "col": 4 },
+            { "row": 6, "col": 4 },
+            { "row": 5, "col": 4 },
+            { "row": 4, "col": 4 }
+          ]
+        },
+        { "id": "a3", "dir": "left", "body": [{ "row": 1, "col": 3 }] },
+        { "id": "a4", "dir": "right", "body": [{ "row": 9, "col": 8 }] },
+        { "id": "a5", "dir": "up", "body": [{ "row": 2, "col": 7 }] }
+      ],
+      "solution": ["a2", "a1", "a3", "a4", "a5"]
+    },
+    {
+      "_teaches": "ONLY THE HEAD'S LANE COUNTS. a1 bends: its tail runs right along row 3, and a2 sits squarely in front of that tail. a1 is still free, because its HEAD is in row 4 and row 4 is clear ahead of it. The tail leaves by retracing the head's route. Meanwhile a3 really is blocked — by a1's body. This is the rule people get wrong.",
+      "id": 4,
+      "tier": "warmup",
+      "rows": 11,
+      "cols": 11,
+      "arrows": [
+        {
+          "id": "a1",
+          "dir": "right",
+          "body": [
+            { "row": 3, "col": 2 },
+            { "row": 3, "col": 3 },
+            { "row": 3, "col": 4 },
+            { "row": 4, "col": 4 },
+            { "row": 4, "col": 5 }
+          ]
+        },
+        { "id": "a2", "dir": "up", "body": [{ "row": 3, "col": 7 }] },
+        { "id": "a3", "dir": "right", "body": [{ "row": 4, "col": 0 }] },
+        { "id": "a4", "dir": "down", "body": [{ "row": 8, "col": 3 }] },
+        { "id": "a5", "dir": "down", "body": [{ "row": 0, "col": 9 }] },
+        { "id": "a6", "dir": "left", "body": [{ "row": 6, "col": 8 }] }
+      ],
+      "solution": ["a1", "a3", "a2", "a4", "a5", "a6"]
+    },
+    {
+      "_teaches": "A chain. Exactly ONE arrow can move (a8), and the whole board unwinds from it, one arrow at a time, in order. There is no choice to make on any turn — only one arrow to find.",
+      "id": 5,
+      "tier": "warmup",
+      "rows": 11,
+      "cols": 11,
+      "arrows": [
+        { "id": "a1", "dir": "up", "body": [{ "row": 9, "col": 1 }] },
+        { "id": "a2", "dir": "right", "body": [{ "row": 5, "col": 1 }] },
+        { "id": "a3", "dir": "up", "body": [{ "row": 5, "col": 6 }] },
+        { "id": "a4", "dir": "left", "body": [{ "row": 2, "col": 6 }] },
+        { "id": "a5", "dir": "down", "body": [{ "row": 2, "col": 2 }] },
+        { "id": "a6", "dir": "right", "body": [{ "row": 7, "col": 2 }] },
+        { "id": "a7", "dir": "up", "body": [{ "row": 7, "col": 8 }] },
+        { "id": "a8", "dir": "right", "body": [{ "row": 3, "col": 8 }] }
+      ],
+      "solution": ["a8", "a7", "a6", "a5", "a4", "a3", "a2", "a1"]
+    }
+  ]
+}
