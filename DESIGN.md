@@ -52,8 +52,13 @@ leans on both:
 
 There is one exception to "an arrow can always eventually move", and it is worth knowing about
 because it is invisible until it ruins a board: an arrow whose body **spirals in front of its own
-head** can never move at all, and a single one makes a board unsolvable. The generator refuses to
-build them; `rules.ts` refuses to call them free; there are tests for both.
+head** can never move at all, and a single one makes a board unsolvable. `rules.ts` refuses to call
+such an arrow free, and there are tests for it.
+
+The baker cannot produce one at all, and gets that for free rather than by checking: a body is grown
+only through *unclaimed* cells while its lane runs only over *claimed* ones, and those two sets are
+disjoint by definition. The body can never reach its own lane. (Bodies with plenty of folds are very
+much wanted — see the fold budget — so this mattering is not hypothetical.)
 
 ## Levels are fixed data, not generated at runtime
 
@@ -85,63 +90,130 @@ web manifest wants PNGs for the install prompt.
 
 ## How the levels are built
 
-A randomly strewn board is essentially never solvable, so the generator never places arrows and
-hopes. It builds each board **backwards, in reverse escape order**: every new arrow goes into a spot
-whose lane is already clear of every arrow placed before it. That arrow could therefore escape once
-the earlier ones are gone — which is exactly what "removed later" means. **Reversing the placement
-order is a valid solution, by construction**, which is also where the hint system comes from for free.
+The baker builds each board in **escape order** — the order the arrows will leave — and obeys exactly
+one rule:
 
-Difficulty is then aimed at directly. The dial is `targetFreeRatio`: **how few arrows you can tap on
-turn one.** That, not the arrow count, is what makes a board hard — a big board where everything is
-already free is easier than a small one where a single arrow can move and the rest must unwind from
-it.
+> A new arrow's exit lane may pass only over cells belonging to arrows that have **already escaped**
+> (or off the board entirely). It may never cross a cell that is still unclaimed.
 
-| Tier    | Levels | Grid  | Arrows | Body length | Free at start |
-| ------- | ------ | ----- | ------ | ----------- | ------------- |
-| Warm up | 1–5    | 6×6   | 4–6    | 1–4 cells   | ~30%          |
-| Easy    | 6–20   | 9×9   | 20–24  | 1–4         | ~18%          |
-| Medium  | 21–50  | 11×11 | 20–26  | 2–5         | ~13%          |
-| Tricky  | 51–100 | 14×14 | 23–30  | 2–6         | ~9%           |
+Everything else follows from that one line.
 
-At the top of the campaign that means two or three tappable arrows out of thirty.
+**Why it is a valid puzzle.** Arrow `i`'s lane contains cells of arrows `1..i-1` and nothing else. By
+the time it is arrow `i`'s turn to leave, arrows `1..i-1` are gone, so its lane is empty and it can
+go. The order the baker built the arrows in **is a solution, by construction** — no solver, no
+backtracking — which is also where the hint system comes from for free.
 
-Four findings from tuning that curve, all of which cost real time:
+**Why the board can always be filled.** The baker can never paint itself into a corner, and this is
+the part worth seeing. Take the topmost unclaimed cell and point an arrow *up* out of it: every cell
+above it is, by the definition of "topmost", already claimed — so that lane is legal. A legal move
+therefore always exists, whatever the board looks like, right down to the last empty cell. The grid
+fills completely, every time.
+
+### Why the boards are FULL
+
+Every board from level 11 to 100 is **completely full**. Not one empty cell.
+
+This is not decoration, and it is not (only) about looking dense. On a board with no gaps, an arrow
+is free **if and only if its lane is empty** — that is, its head sits on the rim pointing outward.
+Any other arrow's lane has to run into *somebody*, because every cell belongs to someone. So:
+
+> On a full board, the arrows you can tap on turn one are exactly the arrows with a head on the rim.
+
+And the baker chooses those. `freeAllowance` stops being a ratio the generator chases and becomes a
+number it simply *decides*. Set it to 1 and there is precisely **one arrow on the entire board you
+may tap**, with fifty-odd others waiting behind it — and the whole thing unwinds from the single move
+you have to find.
+
+**This is why the old generator was rewritten.** It worked the other way round — placing arrows
+wherever a lane happened to be clear already — and it could *never* fill a board. As the board
+crowds, almost no cell has a clear ray to an edge left, so placement starved at around half full and
+no amount of raising the arrow ceiling moved it. The fix was not a bigger budget. It was building the
+board in the other direction.
+
+The old approach also had a floor it could not get under, for a reason that is worth recording
+because it is genuinely counter-intuitive: dropping a blocker in front of a free arrow *does not
+reduce the number of free arrows*. The blocker was only legal because its own lane was clear, so the
+instant it lands, it is free itself. Block one, create one. The free count only fell when a single
+body crossed two lanes at once, which is rare — so the curve sat pinned around 8% however hard the
+target was pushed. On a full board the question does not arise: freeness is a property of the rim,
+and the rim is finite.
+
+### The curve is per LEVEL, not per tier
+
+Difficulty used to be a lookup of four tier configs, so **every level inside a tier was built from
+identical numbers** — the same grid, the same fold budget, the same target. Levels 51 and 100 were
+the same board. The campaign had *four* steps in it, not a hundred, and the back half was fifty
+levels of no progression whatever. It felt flat because it was flat.
+
+So `configFor(level)` in `tiers.ts` now interpolates between anchors, level by level. Level 73 is
+built to be a shade harder than level 72. **The tiers survive only as labels** — a name in the HUD
+and a heading in the picker — and decide nothing about how a board is built.
+
+Three dials ramp together, because no one of them is a strong enough lever on its own:
+
+|                          | Level 11 | → | Level 100 |
+| ------------------------ | -------- | - | --------- |
+| Grid                     | 11×11    | → | 16×16     |
+| Body length              | 1–4 cells | → | 3–10 cells |
+| Folds (bends per body)   | 2        | → | 8         |
+| Board fill               | 100%     | → | 100%      |
+| **Arrows you may tap**   | **7**    | → | **1**     |
+
+The **grid grows** so a later board is more to take in. The **bodies lengthen and fold**, so a late
+arrow is a nested serpent where an early one is a stub — harder to trace by eye, and crossing far
+more of everyone else's lanes. And the **tappable arrows are rationed down to one**.
+
+Levels 6–10 are the ramp in: they fill from about three-quarters up to whole, so the step out of the
+hand-authored tutorial is not a cliff.
+
+### Three findings, all of which cost real time
 
 - **Arrows nothing can ever block.** An arrow whose head sits on the rim pointing outward has a lane
-  of zero cells — free on turn one, free forever, no matter how the board is tuned. The generator
-  refuses them.
-- **Blockability is not the same as tangle.** Scoring candidates only on how many arrows they *block*
-  left the hard tier flatlined at 31% free — barely different from medium — because nothing stopped
-  the generator filling the board with arrows that no *later* arrow could ever get in front of. The
-  score also has to reward a candidate for having a lane with room in it.
-- **More arrows is not more difficulty.** The main placement loop has a floor: an arrow can only be
-  blocked by one placed *after* it, so whatever is still free when the loop runs out of arrows stays
-  free forever. Cranking the count backfires — past a point a denser board has *less* room to choose
-  placements in, so late arrows land wherever they fit rather than where they would do damage. Going
-  from 30 to 34 arrows on a 12×12 made the tricky tier **easier** (20% free → 27%). What fixed it was
-  a **tightening pass** (`tighten()` in `generator.ts`) that places extra arrows for one reason only:
-  each must block something that is currently free. It stops as soon as the board hits its target, so
-  it adds exactly as much as the difficulty needs and no filler.
-- **A lower base arrow count makes a HARDER board**, which is the least intuitive line in the whole
-  project. `arrows` is where the random pass stops; `maxArrows` is where tightening may go. The
-  random pass scatters arrows wherever they legally fit, so every one it lays down is a cell that
-  tightening — which only places arrows that *block* something — can no longer use. Pack the board up
-  front and tightening finds no legal home, gives up early, and the free arrows stay free. Dropping
-  the tricky tier's base from 30 arrows to 22, on the same 14×14 board with the same ceiling, took it
-  from 15% free to **9%**. The gap between `arrows` and `maxArrows` is where the difficulty lives.
-  Tightening also deliberately builds *short* bodies whatever the tier's usual length: by then the
-  only cells left are scraps, and the gap in front of a still-free arrow is exactly what a six-cell
-  serpent cannot fit into.
+  of zero cells — free on turn one, free forever. In the old generator these were poison, and it was
+  worth a hard floor under the whole difficulty curve to allow even two of them. In *this* generator
+  they are the entire mechanism: they are the only free arrows a full board can have, so they are
+  rationed rather than banned. Same fact, opposite conclusion — which is why it is written down.
+- **Warnsdorff's rule, and it is backwards from what you would guess.** When a body grows, it steps
+  into the *most constrained* neighbouring cell — the one with the fewest ways on from it — not the
+  roomiest. Grabbing the roomiest cell instead leaves the awkward ones stranded, and a cell with no
+  free neighbours is a cell no body can ever be grown through: it can only become a one-cell arrow.
+  Half of every board came out as single-cell stubs that way (143 of 301), the fold budget went
+  unspent, and the "serpents" were nubs. Eating the awkward cells while they are still reachable
+  strands far fewer of them.
+- **A head with a claimed cell behind it can only ever be a one-cell arrow.** There is nowhere for a
+  body to go. The baker prefers heads that can actually grow one and leaves the stubs for last, which
+  is exactly when they are unavoidable anyway. This took the single-cell arrows from 90 to 36.
 
-Run `npx tsx scripts/measure-curve.ts` to print the curve the baker actually produces.
+Run `npx tsx scripts/measure-curve.ts` to print the curve the baker actually produces. It samples
+levels, not tiers, and what to look for is `fill` hitting 1.00 by level 11 and staying there, `free`
+falling to 1, and `folds` climbing.
+
+### The hand-authored opening
 
 Levels 1–5 are **hand-authored** (`src/levels/tutorial.json`) rather than generated, so the first
-five boards teach the rule on purpose: tap a free arrow; meet a blocker; discover that an arrow's
-*body* blocks other arrows; discover that only the *head's* lane blocks the arrow itself; then a
-six-arrow chain where exactly one arrow can move and the whole board unwinds from it, one at a time.
+five boards teach the rule on purpose. Each adds exactly one idea, and each is verified by
+`levels.test.ts` like any other level:
+
+| # | Teaches                                                                    | Free at start |
+| - | -------------------------------------------------------------------------- | ------------- |
+| 1 | Tap an arrow and it leaves. Nothing is in anyone's way.                     | 5 of 5        |
+| 2 | An arrow can be **blocked**, so a pair has an order.                        | 3 of 5        |
+| 3 | An arrow has a **body**, and the body blocks other arrows.                  | 4 of 5        |
+| 4 | **Only the head's lane counts** — the bent arrow is free despite the arrow sitting in front of its tail. | 5 of 6 |
+| 5 | A **chain**: exactly one arrow can move, and the board unwinds from it.     | 1 of 8        |
+
+Level 4 is the one that matters. It is the rule people get wrong, so the board is built to be
+actively misleading: `a1`'s tail runs along row 3 with another arrow squarely in front of it, and
+`a1` is free anyway, because its *head* is in row 4 and row 4 is clear. Sitting right beside it is
+`a3`, which really is blocked — by `a1`'s body. Same board, both halves of the rule.
+
+These five are deliberately **not** full boards — a full board is exactly the wrong thing to hand
+someone who does not yet know the rule. They are sparse on purpose, and what makes them gentle is how
+few arrows are on them, not a smaller grid: they sit on the same 11×11 the campaign opens at.
 
 The generator cannot reach these five, so when the campaign's difficulty is raised, they have to be
-tightened **by hand** — otherwise the game still opens with five boards that fall over on their own.
+rebuilt **by hand** — otherwise the game still opens with five boards that fall over on their own.
+Raising the *grid* means re-authoring them too, not just retuning a number.
 
 ## Design notes
 
@@ -179,7 +251,8 @@ src/
   game/                      pure domain layer: no React, no DOM
     geometry.ts              cells, shapes, exit lanes, self-blocking
     rules.ts                 THE RULE. Shared by the app, the tests and the baker.
-    generator.ts             reverse-placement baker (build-time only)
+    tiers.ts                 THE CURVE. configFor(level) - difficulty per level, not per tier
+    generator.ts             escape-order baker: builds FULL boards (build-time only)
     engine.ts                the state machine, as a pure reducer
     hint.ts                  next safe move, computed from the live board
   view/arrowPath.ts          arrow -> SVG geometry, including the escape path

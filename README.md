@@ -27,8 +27,12 @@ no sequence of good moves can dead-end you. The only way to lose is to tap somet
 **Stars.** Three for clearing a board with no collisions *and* no hints; two if you lost at most one
 heart; one otherwise.
 
-**100 levels**, unlocked in order. The first five are hand-authored to teach the rule; by the tricky
-tier, only two or three arrows out of thirty can be tapped on turn one.
+**100 levels**, unlocked in order, and the difficulty is tuned **level by level** rather than in a few
+big steps. The first five are hand-authored to teach the rule. From level 11 on, **every board is
+completely full** — there is not one empty cell on it. From there the grid grows (11×11 up to 16×16),
+the arrows grow longer and fold back on themselves more (two corners early, seven or eight late), and
+the number of arrows you may tap on turn one is rationed down from seven to, on the last board,
+**exactly one**. Find it, and the other fifty-odd unwind from it.
 
 **Keyboard.** Arrows are focusable — `Enter` or `Space` taps the one in focus. `H` hints, `R`
 restarts, `N` goes to the next level. Honours `prefers-reduced-motion` and `prefers-color-scheme`.
