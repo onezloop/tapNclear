@@ -1,0 +1,338 @@
+/**
+ * Layout. Generous whitespace, one card, and the board as the only thing with any weight.
+ */
+
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 16px 40px;
+}
+
+/* ---------- HUD ---------- */
+
+.hud {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.hud__hearts {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.heart {
+  width: 26px;
+  height: 24px;
+}
+
+.heart--filled {
+  fill: var(--danger);
+}
+
+.heart--spent {
+  fill: var(--line);
+}
+
+.hud__progress {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.hud__progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transform-origin: left;
+  transition: transform 320ms var(--ease);
+}
+
+.hud__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hud__level {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 10px;
+  margin-left: -10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.hud__level:hover {
+  background: var(--line);
+}
+
+.hud__tier {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.hud__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.hud__button {
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  transition: color 160ms var(--ease), border-color 160ms var(--ease);
+}
+
+.hud__button:hover {
+  color: var(--ink);
+  border-color: var(--ink-faint);
+}
+
+/* ---------- Board ---------- */
+
+.app__board {
+  width: 100%;
+  max-width: 640px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.board {
+  width: 100%;
+  height: auto;
+  max-height: 72dvh;
+
+  /* The SVG clips to its own viewBox, which is the point: an escaping arrow slides off
+     the edge of the BOARD and is gone. With overflow visible it kept on travelling up the
+     page through the empty space above the board, which looked absurd. */
+  overflow: hidden;
+}
+
+.board__dots circle {
+  fill: var(--dot);
+}
+
+/* ---------- Overlays ---------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(18 20 31 / 32%);
+  backdrop-filter: blur(3px);
+  animation: overlay-in 200ms var(--ease);
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.overlay__card {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 28px 24px;
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.overlay__card--wide {
+  max-width: 560px;
+  align-items: stretch;
+  text-align: left;
+}
+
+.overlay__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 650;
+}
+
+.overlay__note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.overlay__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.overlay__button {
+  padding: 10px 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 15px;
+  font-weight: 550;
+}
+
+.overlay__button--primary {
+  border-color: transparent;
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.stars {
+  display: flex;
+  gap: 6px;
+}
+
+.star {
+  width: 34px;
+  height: 34px;
+}
+
+.star--filled {
+  fill: var(--gold);
+}
+
+.star--empty {
+  fill: var(--line);
+}
+
+/* ---------- Level picker ---------- */
+
+.picker__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.picker__scroll {
+  max-height: 60dvh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.picker__tier-name {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.picker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 8px;
+}
+
+.picker__cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.picker__cell--locked {
+  color: var(--ink-faint);
+  background: transparent;
+  border-style: dashed;
+  cursor: default;
+}
+
+.picker__lock {
+  width: 9px;
+  height: 11px;
+  fill: var(--ink-faint);
+  stroke: var(--ink-faint);
+}
+
+.picker__cell--current {
+  border-color: var(--accent);
+}
+
+.picker__number {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.picker__stars {
+  min-height: 12px;
+  font-size: 10px;
+  color: var(--gold);
+}
+
+/* ---------- Confetti (a perfect clear only) ---------- */
+
+.confetti {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti__piece {
+  position: absolute;
+  top: -20px;
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  animation: confetti-fall var(--duration) var(--delay) cubic-bezier(0.25, 0.6, 0.4, 1) forwards;
+}
+
+@keyframes confetti-fall {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--drift), 105dvh) rotate(var(--spin));
+  }
+}
+
+@media (max-width: 420px) {
+  .app {
+    gap: 18px;
+    padding: 16px 12px 28px;
+  }
+}
+
+/* The stars and the wording already say "perfect". The confetti is the flourish, and a
+   flourish is exactly what someone who asked for less motion does not want. */
+@media (prefers-reduced-motion: reduce) {
+  .confetti {
+    display: none;
+  }
+}

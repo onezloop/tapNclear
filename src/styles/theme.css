@@ -1,0 +1,80 @@
+/**
+ * One ink colour, one danger colour, one accent. That is the whole palette.
+ *
+ * The reference boards are monochrome for a reason: on a 12x12 board with thirty
+ * interlocking arrows, colour-coding directions would turn the board into confetti and
+ * make it harder to read, not easier. Direction is already carried by the arrowhead,
+ * which is unambiguous. So colour here means exactly one thing — something happened —
+ * and the board is otherwise calm.
+ */
+
+:root {
+  --ink: #1b2143;
+  --ink-soft: #5b6386;
+  --ink-faint: #aeb4cc;
+
+  --surface: #ffffff;
+  --canvas: #f7f7fb;
+  --line: #e9e9f2;
+
+  --danger: #ff4d5f;
+  --accent: #6c7cf5;
+  --gold: #ffc25c;
+
+  --dot: #dcdfec;
+
+  --radius: 14px;
+  --shadow: 0 1px 2px rgb(27 33 67 / 6%), 0 8px 24px rgb(27 33 67 / 6%);
+
+  --escape-ms: 480ms;
+  --block-ms: 700ms;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e7e9f7;
+    --ink-soft: #9aa1c0;
+    --ink-faint: #5b6386;
+
+    --surface: #191c2b;
+    --canvas: #12141f;
+    --line: #262a3d;
+
+    --danger: #ff6b7a;
+    --accent: #8b98ff;
+
+    --dot: #2b3048;
+
+    --shadow: 0 1px 2px rgb(0 0 0 / 20%), 0 8px 24px rgb(0 0 0 / 24%);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: ui-rounded, 'SF Pro Rounded', -apple-system, 'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}

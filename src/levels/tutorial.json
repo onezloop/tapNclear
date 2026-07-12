@@ -1,0 +1,94 @@
+{
+  "_comment": "Levels 1-5, authored by hand rather than generated, so the first five boards teach the rule on purpose instead of leaving a player's first impression to chance. Each one adds exactly one idea. Verified by levels.test.ts like every other level.",
+  "levels": [
+    {
+      "_teaches": "Tap an arrow and it leaves. Nothing is in anyone's way.",
+      "id": 1,
+      "tier": "warmup",
+      "rows": 6,
+      "cols": 6,
+      "arrows": [
+        { "id": "a1", "dir": "right", "body": [{ "row": 1, "col": 1 }] },
+        { "id": "a2", "dir": "left", "body": [{ "row": 3, "col": 4 }] },
+        { "id": "a3", "dir": "up", "body": [{ "row": 4, "col": 2 }] }
+      ],
+      "solution": ["a1", "a2", "a3"]
+    },
+    {
+      "_teaches": "An arrow can be blocked. a2 stands in a1's lane, and a4 stands in a3's, so each pair has an order.",
+      "id": 2,
+      "tier": "warmup",
+      "rows": 6,
+      "cols": 6,
+      "arrows": [
+        { "id": "a1", "dir": "right", "body": [{ "row": 2, "col": 1 }] },
+        { "id": "a2", "dir": "up", "body": [{ "row": 2, "col": 3 }] },
+        { "id": "a3", "dir": "down", "body": [{ "row": 4, "col": 5 }] },
+        { "id": "a4", "dir": "left", "body": [{ "row": 5, "col": 5 }] }
+      ],
+      "solution": ["a2", "a1", "a4", "a3"]
+    },
+    {
+      "_teaches": "An arrow has a BODY, and the body blocks other arrows. The long arrow a2 lies across a1's lane.",
+      "id": 3,
+      "tier": "warmup",
+      "rows": 6,
+      "cols": 6,
+      "arrows": [
+        { "id": "a1", "dir": "right", "body": [{ "row": 3, "col": 0 }] },
+        {
+          "id": "a2",
+          "dir": "up",
+          "body": [
+            { "row": 5, "col": 3 },
+            { "row": 4, "col": 3 },
+            { "row": 3, "col": 3 },
+            { "row": 2, "col": 3 }
+          ]
+        },
+        { "id": "a3", "dir": "left", "body": [{ "row": 1, "col": 2 }] },
+        { "id": "a4", "dir": "up", "body": [{ "row": 1, "col": 0 }] }
+      ],
+      "solution": ["a2", "a1", "a4", "a3"]
+    },
+    {
+      "_teaches": "ONLY THE HEAD'S LANE COUNTS. a1 bends: its tail runs along row 1, and a2 sits squarely in front of that tail. a1 is still free, because its HEAD is in row 2 and row 2 is clear. The tail leaves by retracing the head's route. This is the rule people get wrong.",
+      "id": 4,
+      "tier": "warmup",
+      "rows": 6,
+      "cols": 6,
+      "arrows": [
+        {
+          "id": "a1",
+          "dir": "right",
+          "body": [
+            { "row": 1, "col": 1 },
+            { "row": 1, "col": 2 },
+            { "row": 2, "col": 2 },
+            { "row": 2, "col": 3 }
+          ]
+        },
+        { "id": "a2", "dir": "up", "body": [{ "row": 1, "col": 4 }] },
+        { "id": "a3", "dir": "right", "body": [{ "row": 2, "col": 0 }] },
+        { "id": "a4", "dir": "right", "body": [{ "row": 0, "col": 4 }] }
+      ],
+      "solution": ["a1", "a3", "a4", "a2"]
+    },
+    {
+      "_teaches": "A chain. Exactly ONE arrow can move (a6), and the whole board unwinds from it, one arrow at a time, in order.",
+      "id": 5,
+      "tier": "warmup",
+      "rows": 6,
+      "cols": 6,
+      "arrows": [
+        { "id": "a1", "dir": "up", "body": [{ "row": 1, "col": 2 }] },
+        { "id": "a2", "dir": "left", "body": [{ "row": 1, "col": 4 }] },
+        { "id": "a3", "dir": "up", "body": [{ "row": 3, "col": 4 }] },
+        { "id": "a4", "dir": "right", "body": [{ "row": 3, "col": 1 }] },
+        { "id": "a5", "dir": "up", "body": [{ "row": 5, "col": 1 }] },
+        { "id": "a6", "dir": "left", "body": [{ "row": 0, "col": 2 }] }
+      ],
+      "solution": ["a6", "a1", "a2", "a3", "a4", "a5"]
+    }
+  ]
+}

@@ -1,0 +1,190 @@
+/**
+ * The board is completely still until the player does something. No idle bounce, no
+ * shimmer, no pulse, no countdown. Every animation in this file is a direct answer to a
+ * tap — which is what makes the one thing that DOES move impossible to miss.
+ */
+
+.arrow__hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 26; /* generous thumb target over a 6.5px line */
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.arrow__body {
+  fill: none;
+  stroke: var(--ink);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  /* The body is a dash exactly as long as the body, sitting at the start of a path that
+     continues off the board. Sliding the dash forward threads the arrow out along its own
+     route — through its own bends — which is precisely what the rule says happens. */
+  stroke-dasharray: var(--body-length) var(--gap);
+  stroke-dashoffset: 0;
+}
+
+.arrow__head {
+  fill: var(--ink);
+
+  /* Fallback for browsers without motion paths: park the head at the head cell. The body
+     still slides out; only the head stays put. */
+  transform: translate(var(--head-x), var(--head-y)) rotate(var(--head-angle));
+}
+
+@supports (offset-path: path('M 0 0')) {
+  .arrow__head {
+    transform: none;
+    offset-path: var(--path);
+    offset-distance: var(--head-rest);
+    offset-rotate: auto;
+  }
+}
+
+.arrow {
+  cursor: pointer;
+}
+
+.arrow--idle:hover .arrow__body,
+.arrow--idle:hover .arrow__head {
+  opacity: 0.72;
+}
+
+/**
+ * Keyboard focus recolours the arrow instead of drawing a box around it.
+ *
+ * A default outline is drawn around the element's bounding box — and an arrow's path runs
+ * from behind its tail all the way off the board, so that box is vast. Focusing an arrow
+ * drew a rectangle across the whole screen. Recolouring is also simply better: it marks
+ * the arrow itself rather than the rectangle it happens to span.
+ */
+.arrow:focus {
+  outline: none;
+}
+
+.arrow:focus-visible {
+  outline: none;
+}
+
+.arrow:focus-visible .arrow__body {
+  stroke: var(--accent);
+}
+
+.arrow:focus-visible .arrow__head {
+  fill: var(--accent);
+}
+
+/* ESCAPE — the arrow threads itself out along its own path and off the board. */
+.arrow--escaping {
+  pointer-events: none;
+}
+
+.arrow--escaping .arrow__body {
+  stroke-dashoffset: var(--exit-offset);
+  transition: stroke-dashoffset var(--escape-ms) var(--ease);
+}
+
+.arrow--escaping .arrow__head {
+  offset-distance: var(--head-exit);
+  transition: offset-distance var(--escape-ms) var(--ease);
+}
+
+/* BLOCKED — the arrow lurches at whatever stopped it, and both light up.
+   Naming the blocker is the teaching moment: the board answers "why not?" rather than
+   just refusing the move. */
+.arrow--blocked .arrow__body,
+.arrow--blocked .arrow__head {
+  stroke: var(--danger);
+  fill: var(--danger);
+}
+
+.arrow--blocked .arrow__body {
+  stroke: var(--danger);
+  fill: none;
+}
+
+.arrow--blocked {
+  animation: lurch var(--block-ms) var(--ease);
+}
+
+.arrow--blocker .arrow__body {
+  stroke: var(--danger);
+}
+
+.arrow--blocker .arrow__head {
+  fill: var(--danger);
+}
+
+.arrow--blocker {
+  animation: flash var(--block-ms) var(--ease);
+}
+
+@keyframes lurch {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(2px, 0);
+  }
+  40% {
+    transform: translate(-2px, 0);
+  }
+  60% {
+    transform: translate(2px, 0);
+  }
+  80% {
+    transform: translate(-1px, 0);
+  }
+}
+
+@keyframes flash {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* HINT — the only time an arrow is ever singled out. Free arrows deliberately look
+   exactly like stuck ones: working out which can move IS the game, so marking them would
+   be handing over the answer. */
+.arrow--hinted .arrow__body {
+  stroke: var(--accent);
+}
+
+.arrow--hinted .arrow__head {
+  fill: var(--accent);
+}
+
+.arrow--hinted {
+  animation: breathe 1.1s var(--ease) infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Feedback still fires — a player must always know WHY a move failed — but nothing
+   travels, and nothing repeats. */
+@media (prefers-reduced-motion: reduce) {
+  .arrow--escaping .arrow__body,
+  .arrow--escaping .arrow__head {
+    transition: none;
+  }
+
+  .arrow--blocked,
+  .arrow--blocker,
+  .arrow--hinted {
+    animation: none;
+  }
+}
